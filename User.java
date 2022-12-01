@@ -51,7 +51,11 @@ public class User {
                     day = LocalDate.now().getDayOfMonth();
                     System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
                 }
+            }else{
+                day = LocalDate.now().getDayOfMonth();
+                System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
             }
+            scan.nextLine();
             System.out.print(ANSI_YELLOW + "Введіть місяць: " + ANSI_RESET);
             if(scan.hasNextInt()) {
                 month = scan.nextInt();
@@ -59,6 +63,9 @@ public class User {
                     month = LocalDate.now().getMonthValue();
                     System.out.println("You entered wrong value, you have to finish this task in this month");
                 }
+            }else{
+                month = LocalDate.now().getMonthValue();
+                System.out.println("You entered wrong value, you have to finish this task in this month");
             }
             scan.nextLine();
             expiryDate = LocalDate.of(LocalDate.now().getYear(), month, day);
@@ -111,15 +118,12 @@ public class User {
 //    /**
 //     * виводимо список з тасками перед записом у файл
 //     */
-//    public void showListTasks() {
-//        System.out.print(ANSI_YELLOW + "Ваші таски: " + ANSI_RESET);
-//        System.out.println();
-//        for (int i = 0; i < tasks.size(); i++) {
-//            String x = "Task №" + i + " " + tasks.get(i);
-//            System.out.print(x);
-//            System.out.println();
-//        }
-//    }
+    public void showListTasks() {
+        System.out.println(ANSI_YELLOW + "Ваші таски: " + ANSI_RESET);
+        for (int i = 0; i < tasksList.size(); i++) {
+            System.out.println(tasksList.get(i));
+        }
+    }
 //
 //    /**
 //     * виводимо всі таски з файлу

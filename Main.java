@@ -10,13 +10,10 @@ public class Main {
 //        for (int i = 0; i < 1; i++) {
 //            method();
 //        }
-        new User().fillList();
-        new User().fillList();
-        new User().fillList();
-        new User().fillList();
-        new User().fillList();
-        new User().fillList();
-    }
+        User user = new User();
+        user.fillList();
+        user.showListTasks();
+
 
 //    public static void method() {
 //        User me = new User();
@@ -60,5 +57,5 @@ public class Main {
 //                break;
 //        }
 //    }
-
+    }
 }
