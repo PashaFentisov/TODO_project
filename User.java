@@ -135,7 +135,7 @@ public class User {
         System.out.println(ANSI_YELLOW + "\nВсього тасків: " + countAllTasks);
         System.out.println("Виконаних тасків: " + countDoneTasks);
         System.out.println("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
-        temporaryListToReadFromFile.clear(); //TODO якщо не будем десь ще юзати то робим нул тут
+        temporaryListToReadFromFile.clear();
     }
 
     public void addTasksToFile() {
@@ -213,36 +213,23 @@ public class User {
 //        }
 //    }
 //
-//    /**
-//     * Зчитуєм з файла рядки і якщо поміченні як DONE то виводимо у консоль
-//     */
-//    public void showDoneTasks() {
-//        int countOnTime = 0;
-//        int countNotOnTime = 0;
-//        String s = "";
-//                System.out.print(ANSI_GREEN + "Виконанні таски " + ANSI_RESET);
-//                System.out.println();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            while (reader.ready()) {
-//                s = reader.readLine();
-//                if (s.contains("DONE")) {
-//                            System.out.print(s);
-//                            System.out.println();
-//                    if (s.contains("Вчасно")) {
-//                        countOnTime++;
-//                    } else {
-//                        countNotOnTime++;
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//                System.out.print(ANSI_YELLOW + "\nВиконано вчасно: " + countOnTime);
-//                System.out.println();
-//                System.out.print("Виконано не вчасно: " + countNotOnTime + ANSI_RESET);
-//                System.out.println();
-//    }
+
+    public void showDoneTasks() {
+        int countOnTime = 0;
+        System.out.println(ANSI_GREEN + "Виконанні таски " + ANSI_RESET);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.ready()) {
+                temporaryListToReadFromFile.add(reader.readLine());
+            }
+            temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).forEach(System.out::println);
+            countOnTime = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).filter(s -> s.contains("Вчасно")).count();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(ANSI_YELLOW + "\nВиконано вчасно: " + countOnTime);
+        System.out.println("Виконано не вчасно: " + (countDoneTasks - countOnTime) + ANSI_RESET);
+    }
+
 //
 //    /**
 //     * Зчитуєм рядок з файлу, якщо він ще не помічений як DONE то виводимо

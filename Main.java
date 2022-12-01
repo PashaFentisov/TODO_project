@@ -14,6 +14,7 @@ public class Main {
         user.fillList();
         user.showListTasks();
         user.showTasksInFile();
+        user.showDoneTasks();
 
 //    public static void method() {
 //        User me = new User();
