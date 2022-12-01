@@ -4,7 +4,9 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
+
 
 /**
  * @author Pasha Fentisov
@@ -27,7 +29,7 @@ public class User {
     static File file = new File("D:" + sep + "idea project" + sep + "SomeProjects" + sep + "src" + sep + "TODO" + sep + "tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
-    private ArrayList<String> temporaryListToReadFromFile = new ArrayList<>();
+    private List<String> temporaryListToReadFromFile = new ArrayList<>();
     Task task;
     private int day;
     private int month;
@@ -137,7 +139,6 @@ public class User {
         System.out.println("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
         temporaryListToReadFromFile.clear();
     }
-
     public void addTasksToFile() {
         System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
         showListTasks();
@@ -221,54 +222,43 @@ public class User {
             while (reader.ready()) {
                 temporaryListToReadFromFile.add(reader.readLine());
             }
-            temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).forEach(System.out::println);
-            countOnTime = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).filter(s -> s.contains("Вчасно")).count();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        countOnTime = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).filter(s -> s.contains("Вчасно")).count();
+        temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).forEach(System.out::println);
+        countDoneTasks = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).count();
         System.out.println(ANSI_YELLOW + "\nВиконано вчасно: " + countOnTime);
         System.out.println("Виконано не вчасно: " + (countDoneTasks - countOnTime) + ANSI_RESET);
+        temporaryListToReadFromFile.clear();
     }
 
-//
-//    /**
-//     * Зчитуєм рядок з файлу, якщо він ще не помічений як DONE то виводимо
-//     */
-//    public void showTasksInProgress() {
-//        int countTime = 0;
-//        int i = 0;
-//        String s = "";
-//                System.out.print(ANSI_RED + "\nНе виконанні завдання" + ANSI_RESET);
-//                System.out.println();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            while (reader.ready()) {
-//                s = reader.readLine();
-//                if (!s.contains("DONE")) {
-//                            System.out.print(i + ". " + s);
-//                            System.out.println();
-//                    try {
-//                        date = s.substring(s.indexOf("Виконати до")).replace("Виконати до ", "").trim() + " " + LocalDate.now().getYear();
-//                        ontime = LocalDate.parse(date, dtf);
-//                        if (ontime.isBefore(LocalDate.now())) {
-//                            countTime++;
-//                        }
-//                    } catch (Exception e) {
-//                    }
-//                    i++;
-//                }
-//
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        if (countTime == 0) {
-//                    System.out.print(ANSI_GREEN + countTime + " - З пропущеним строком виконання" + ANSI_RESET);
-//                    System.out.println();
-//        } else {
-//                    System.out.print(ANSI_RED + countTime + " - З пропущеним строком виконання" + ANSI_RESET);
-//                    System.out.println();
-//        }
-//    }
+
+
+    public void showTasksInProgress() {   //TODO виводити кількфсть не з пропущеним і скільки осталось до дедлайна
+        int countTime = 0;
+        System.out.println(ANSI_RED + "\nНе виконанні завдання" + ANSI_RESET);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.ready()) {
+                temporaryListToReadFromFile.add(reader.readLine());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        temporaryListToReadFromFile.stream().filter(s -> !s.contains("DONE")).forEach(System.out::println);
+        countTime = (int) temporaryListToReadFromFile.stream()
+                .filter(s -> !s.contains("DONE"))
+                .map(s-> s.substring(s.indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear())
+                .map(string->LocalDate.parse(string, Task.getFormatForDateOfMade()))
+                .filter(doBefore -> doBefore.isBefore(LocalDate.now()))
+                .count();
+        if (countTime == 0) {
+            System.out.println(ANSI_GREEN + countTime + " - З пропущеним строком виконання" + ANSI_RESET);
+        } else {
+            System.out.println(ANSI_RED + countTime + " - З пропущеним строком виконання" + ANSI_RESET);
+        }
+        temporaryListToReadFromFile.clear();
+    }
 //
 //    /**
 //     * Зчитуєм рядки з файлу в список

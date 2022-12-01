@@ -6,8 +6,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Task{
-    private DateTimeFormatter formatForDateOfMade = DateTimeFormatter.ofPattern("d MMMM yyyy");
-    private DateTimeFormatter formatForExpiryDate = DateTimeFormatter.ofPattern("d MMMM");
+    static private DateTimeFormatter formatForDateOfMade = DateTimeFormatter.ofPattern("d MMMM yyyy");
+    static private DateTimeFormatter formatForExpiryDate = DateTimeFormatter.ofPattern("d MMMM");
     private String text;
     private boolean isDone;
     private LocalDate doBefore;
@@ -40,6 +40,14 @@ public class Task{
     public Task(String text) {
         this.text = text;
         this.number = ++countOfTasks;
+    }
+
+    public static DateTimeFormatter getFormatForDateOfMade() {
+        return formatForDateOfMade;
+    }
+
+    public static DateTimeFormatter getFormatForExpiryDate() {
+        return formatForExpiryDate;
     }
 
     public Task() {
