@@ -139,6 +139,7 @@ public class User {
         System.out.println("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
         temporaryListToReadFromFile.clear();
     }
+
     public void addTasksToFile() {
         System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
         showListTasks();
@@ -218,13 +219,7 @@ public class User {
     public void showDoneTasks() {
         int countOnTime = 0;
         System.out.println(ANSI_GREEN + "Виконанні таски " + ANSI_RESET);
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            while (reader.ready()) {
-                temporaryListToReadFromFile.add(reader.readLine());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        readFromFileToList();
         countOnTime = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).filter(s -> s.contains("Вчасно")).count();
         temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).forEach(System.out::println);
         countDoneTasks = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).count();
@@ -233,23 +228,15 @@ public class User {
         temporaryListToReadFromFile.clear();
     }
 
-
-
     public void showTasksInProgress() {   //TODO виводити кількфсть не з пропущеним і скільки осталось до дедлайна
         int countTime = 0;
         System.out.println(ANSI_RED + "\nНе виконанні завдання" + ANSI_RESET);
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            while (reader.ready()) {
-                temporaryListToReadFromFile.add(reader.readLine());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        readFromFileToList();
         temporaryListToReadFromFile.stream().filter(s -> !s.contains("DONE")).forEach(System.out::println);
         countTime = (int) temporaryListToReadFromFile.stream()
                 .filter(s -> !s.contains("DONE"))
-                .map(s-> s.substring(s.indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear())
-                .map(string->LocalDate.parse(string, Task.getFormatForDateOfMade()))
+                .map(s -> s.substring(s.indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear())
+                .map(string -> LocalDate.parse(string, Task.getFormatForDateOfMade()))
                 .filter(doBefore -> doBefore.isBefore(LocalDate.now()))
                 .count();
         if (countTime == 0) {
@@ -259,58 +246,67 @@ public class User {
         }
         temporaryListToReadFromFile.clear();
     }
-//
-//    /**
-//     * Зчитуєм рядки з файлу в список
-//     * Обираєм який таск хочем видалити з списку
-//     * По закінченню відредагований список записуєм в файл
-//     * Є варінт повністю очистити файл ввівши "all"
-//     */
-//    public void deleteTasksFromFile() {  //TODO додати видалення зроблених
-//        tasks.clear();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            while (reader.ready()) {
-//                tasks.add(reader.readLine());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        int k;
-//        String s;
-//        while (true) {
-//                    System.out.print(ANSI_YELLOW + "Введіть номер таску якій хочете видалити, якщо хочете видалити все введіть all, для закінчення введіть stop" + ANSI_RESET);
-//                    System.out.println();
-//            for (int i = 0; i < tasks.size(); i++) {
-//                String x = "Task №" + i + " " + tasks.get(i);
-//                        System.out.print(x);
-//                        System.out.println();
-//            }
-//            s = scan.next();
-//            if (s.equalsIgnoreCase("stop")) {
-//                break;
-//            }
-//            if (s.equalsIgnoreCase("all")) {
-//                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-//                    writer.write("");
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                try {
-//                    k = Integer.parseInt(s);
-//                    tasks.remove(k);
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//        }
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-//            for (int i = 0; i < tasks.size(); i++) {
-//                writer.write(tasks.get(i));
-//                writer.newLine();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+    private static int intTemp;
+    public void deleteTasksFromFile() {  //TODO додати видалення зроблених
+        tasksList.clear();
+        String temp;
+        readFromFileToList();
+        while (true) {
+            System.out.println(ANSI_YELLOW + "Поточні таски---------------------------------------------------------------------------------------------------------------" + ANSI_RESET);
+            temporaryListToReadFromFile.forEach(System.out::println);
+            System.out.print(ANSI_YELLOW + "Введіть номер таску якій хочете видалити, якщо хочете видалити все введіть all, для закінчення введіть stop: " + ANSI_RESET);
+            temp = scan.next();
+            if (temp.equalsIgnoreCase("stop")) {
+                break;
+            }
+            if (temp.equalsIgnoreCase("all")) {
+                System.out.print(ANSI_RED + "Всі таски будуть видалені з пам'яті, для підтвердження натисніть enter, для відміни введіть stop: " + ANSI_RESET);
+                scan.nextLine();
+                if(scan.nextLine().equalsIgnoreCase("stop")){
+                    continue;
+                }
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                    writer.write("");
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                System.out.println(ANSI_GREEN + "Всі таски видалено" + ANSI_RESET);
+            } else {
+                try {
+                    intTemp = Integer.parseInt(temp);
+                } catch (Exception e) {
+                    break;
+                }
+            }
+            for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
+                if(temporaryListToReadFromFile.get(i).contains("Task " + intTemp + ":")){
+                    try {
+                        temporaryListToReadFromFile.remove(i);
+                    }catch(Exception e){}
+                    System.out.println(ANSI_GREEN + "Task " + intTemp + " видалено" + ANSI_RESET);
+                }
+            }
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
+                writer.write(temporaryListToReadFromFile.get(i));
+                writer.newLine();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void readFromFileToList() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.ready()) {
+                temporaryListToReadFromFile.add(reader.readLine());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
+//TODO в майбутньому зробити через json запис списку тасків а не тексту
