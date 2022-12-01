@@ -2,7 +2,6 @@ package TODO;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
 import java.util.Scanner;
@@ -12,7 +11,7 @@ import java.util.regex.Matcher;
  * @author Pasha Fentisov
  */
 
-public class User {
+public class User{
 
     private int countDoneTasks = 0;
     private int countAllTasks = 0;
@@ -22,13 +21,12 @@ public class User {
     public static final String ANSI_GREEN = "\u001B[32m";
 
     public static final String ANSI_RED = "\u001B[31m";
-
     public static final String ANSI_YELLOW = "\u001B[33m";
     //TODO Pattern p = Pattern.compile("\\d{1,3}");
     //TODO Matcher m = null;
     String sep = File.separator;
-    File file = new File("D:"+sep+"idea project"+sep+"SomeProjects"+sep+"src"+sep+"TODO"+sep+"tasks.txt"); //TODO розобраться з файлом
-    Scanner scan = new Scanner(System.in);
+    File file = new File("D:" + sep + "idea project" + sep + "SomeProjects" + sep + "src" + sep + "TODO" + sep + "tasks.txt"); //TODO розобраться з файлом
+    transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
     Task task;
     private int day;
@@ -45,25 +43,25 @@ public class User {
             }
             System.out.println(ANSI_YELLOW + "\nВведіть дату до якої треба виконати таск" + ANSI_RESET);
             System.out.print(ANSI_YELLOW + "Введіть день: " + ANSI_RESET);
-            if(scan.hasNextInt()) {
+            if (scan.hasNextInt()) {
                 day = scan.nextInt();
                 if (day > 31 || day <= 0) {
                     day = LocalDate.now().getDayOfMonth();
                     System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
                 }
-            }else{
+            } else {
                 day = LocalDate.now().getDayOfMonth();
                 System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
             }
             scan.nextLine();
             System.out.print(ANSI_YELLOW + "Введіть місяць: " + ANSI_RESET);
-            if(scan.hasNextInt()) {
+            if (scan.hasNextInt()) {
                 month = scan.nextInt();
                 if (month > 12 || month <= 0) {
                     month = LocalDate.now().getMonthValue();
                     System.out.println("You entered wrong value, you have to finish this task in this month");
                 }
-            }else{
+            } else {
                 month = LocalDate.now().getMonthValue();
                 System.out.println("You entered wrong value, you have to finish this task in this month");
             }
@@ -73,10 +71,10 @@ public class User {
             tasksList.add(task);
             System.out.println(task);
         }
-//        addTasksToFile();
+        addTasksToFile();
     }
 
-//    /**
+    //    /**
 //     * редагуєм список тасків перед записом їх у файл
 //     * в гілці if викликаєм метод для додавання тасків до списку
 //     * в гілці else видаляєм таски з списку перед подачею до файлу
@@ -115,16 +113,12 @@ public class User {
 //
 //    }
 //
-//    /**
-//     * виводимо список з тасками перед записом у файл
-//     */
     public void showListTasks() {
         System.out.println(ANSI_YELLOW + "Ваші таски: " + ANSI_RESET);
-        for (int i = 0; i < tasksList.size(); i++) {
-            System.out.println(tasksList.get(i));
-        }
+        tasksList.forEach(System.out::println);
     }
-//
+
+    //
 //    /**
 //     * виводимо всі таски з файлу
 //     */
@@ -157,27 +151,26 @@ public class User {
 //     * якщо щось не так викликаєм метод editList()
 //     * очищаєм список для подальших операцій
 //     */
-//    public void addTasksToFile() {
-//            System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
-//            System.out.println();
-//        showListTasks();
-//        if (!scan.next().equalsIgnoreCase("enter")) {
-//            editList();
-//        } else {
-//            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-//                for (int i = 0; i < tasks.size(); i++) {
-//                    writer.write(tasks.get(i));
-//                    writer.newLine();
-//                }
-//                writer.flush();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//                    System.out.print(ANSI_YELLOW + "Succeed" + ANSI_RESET);
-//                    System.out.println();
-//            tasks.clear();
-//        }
-//    }
+    public void addTasksToFile() {
+        System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
+        showListTasks();
+        if (!scan.next().equalsIgnoreCase("enter")) {
+          //TODO  editList();  and return back
+        } else {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
+                for (int i = 0; i < tasksList.size(); i++) {
+                    writer.write(tasksList.get(i).toString());
+                    writer.newLine();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            System.out.println(ANSI_YELLOW + "Succeed" + ANSI_RESET);
+            tasksList.clear();
+        }
+    }
+
+    //TODO зробити спільний файл який буде гітхабі і таски писатимуться туда шлях до нього буде універсальний
 //
 //    /**
 //     * Помічаєм вибраний таск як зроблений (DONE) і помічаєм датою виконання
