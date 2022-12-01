@@ -13,7 +13,7 @@ public class Main {
         User user = new User();
         user.fillList();
         user.showListTasks();
-
+        user.showTasksInFile();
 
 //    public static void method() {
 //        User me = new User();

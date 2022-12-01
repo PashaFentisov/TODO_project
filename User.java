@@ -2,16 +2,15 @@ package TODO;
 
 import java.io.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.regex.Pattern;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 
 /**
  * @author Pasha Fentisov
  */
 
-public class User{
+public class User {
 
     private int countDoneTasks = 0;
     private int countAllTasks = 0;
@@ -24,10 +23,11 @@ public class User{
     public static final String ANSI_YELLOW = "\u001B[33m";
     //TODO Pattern p = Pattern.compile("\\d{1,3}");
     //TODO Matcher m = null;
-    String sep = File.separator;
-    File file = new File("D:" + sep + "idea project" + sep + "SomeProjects" + sep + "src" + sep + "TODO" + sep + "tasks.txt"); //TODO розобраться з файлом
+    static String sep = File.separator;
+    static File file = new File("D:" + sep + "idea project" + sep + "SomeProjects" + sep + "src" + sep + "TODO" + sep + "tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
+    private ArrayList<String> temporaryListToReadFromFile = new ArrayList<>();
     Task task;
     private int day;
     private int month;
@@ -112,50 +112,37 @@ public class User{
 //        }
 //
 //    }
-//
+//TODO make this class as Singletone
+
+
     public void showListTasks() {
         System.out.println(ANSI_YELLOW + "Ваші таски: " + ANSI_RESET);
         tasksList.forEach(System.out::println);
     }
 
-    //
-//    /**
-//     * виводимо всі таски з файлу
-//     */
-//    public void showTasksInFile() {
-//        System.out.print(ANSI_YELLOW + "Ваші таски в файлі: " + ANSI_RESET);
-//        System.out.println();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            while (reader.ready()) {
-//                s = reader.readLine();
-//                countAllTasks++;
-//                if (s.contains("DONE")) {
-//                    countDoneTasks++;
-//                }
-//                System.out.print(s);
-//                System.out.println();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        System.out.print(ANSI_YELLOW + "\nВсього тасків: " + countAllTasks);
-//        System.out.println();
-//        System.out.print("Виконаних тасків: " + countDoneTasks);
-//        System.out.println();
-//        System.out.print("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
-//        System.out.println();
-//    }
-//
-//    /**
-//     * передаємо всі таски з списку до файлу
-//     * якщо щось не так викликаєм метод editList()
-//     * очищаєм список для подальших операцій
-//     */
+    public void showTasksInFile() {
+        System.out.println(ANSI_YELLOW + "Ваші таски в файлі: " + ANSI_RESET);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.ready()) {
+                temporaryListToReadFromFile.add(reader.readLine());
+            }
+            temporaryListToReadFromFile.forEach(System.out::println);
+            countAllTasks = temporaryListToReadFromFile.size();
+            countDoneTasks = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).count();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println(ANSI_YELLOW + "\nВсього тасків: " + countAllTasks);
+        System.out.println("Виконаних тасків: " + countDoneTasks);
+        System.out.println("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
+        temporaryListToReadFromFile.clear(); //TODO якщо не будем десь ще юзати то робим нул тут
+    }
+
     public void addTasksToFile() {
         System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
         showListTasks();
         if (!scan.next().equalsIgnoreCase("enter")) {
-          //TODO  editList();  and return back
+            //TODO  editList();  and return back
         } else {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
                 for (int i = 0; i < tasksList.size(); i++) {
