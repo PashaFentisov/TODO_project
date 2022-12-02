@@ -10,10 +10,10 @@ import java.util.Scanner;
 
 /**
  * @author Pasha Fentisov
+ * @version 1.0
  */
 
 public class User {
-
     private int countDoneTasks = 0;
     private int countAllTasks = 0;
 
@@ -31,12 +31,10 @@ public class User {
     private LinkedList<Task> tasksList = new LinkedList<>();
     private List<String> temporaryListToReadFromFile = new ArrayList<>();
     Task task;
-    private int day;
-    private int month;
-    private LocalDate expiryDate;
-
 
     public void fillList() {
+        int day;
+        int month;
         while (true) {
             System.out.print(ANSI_YELLOW + "Введіть таск який хочете додати до файлу, або stop: " + ANSI_RESET);
             task = new Task(scan.nextLine());
@@ -47,29 +45,31 @@ public class User {
             System.out.print(ANSI_YELLOW + "Введіть день: " + ANSI_RESET);
             if (scan.hasNextInt()) {
                 day = scan.nextInt();
-                if (day > 31 || day <= 0) {
-                    day = LocalDate.now().getDayOfMonth();
+                try{
+                    task.setDoBefore(task.getDoBefore().withDayOfMonth(day));
+                }catch(Exception e){
                     System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
+                    task.setDoBefore(task.getDoBefore().withDayOfMonth(LocalDate.now().getDayOfMonth()));
                 }
             } else {
-                day = LocalDate.now().getDayOfMonth();
+                task.setDoBefore(task.getDoBefore().withDayOfMonth(LocalDate.now().getDayOfMonth()));
                 System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
             }
             scan.nextLine();
             System.out.print(ANSI_YELLOW + "Введіть місяць: " + ANSI_RESET);
             if (scan.hasNextInt()) {
                 month = scan.nextInt();
-                if (month > 12 || month <= 0) {
-                    month = LocalDate.now().getMonthValue();
-                    System.out.println("You entered wrong value, you have to finish this task in this month");
+                try{
+                    task.setDoBefore(task.getDoBefore().withMonth(month));
+                }catch(Exception e){
+                    System.out.println("You entered wrong value, you have to finish this task this month");
+                    task.setDoBefore(task.getDoBefore().withMonth(LocalDate.now().getMonthValue()));
                 }
             } else {
-                month = LocalDate.now().getMonthValue();
-                System.out.println("You entered wrong value, you have to finish this task in this month");
+                System.out.println("You entered wrong value, you have to finish this task this month");
+                task.setDoBefore(task.getDoBefore().withMonth(LocalDate.now().getMonthValue()));
             }
             scan.nextLine();
-            expiryDate = LocalDate.of(LocalDate.now().getYear(), month, day);
-            task.setDoBefore(expiryDate);
             tasksList.add(task);
             System.out.println(task);
         }
@@ -228,7 +228,7 @@ public class User {
         temporaryListToReadFromFile.clear();
     }
 
-    public void showTasksInProgress() {   //TODO виводити кількфсть не з пропущеним і скільки осталось до дедлайна
+    public void showTasksInProgress() {   //TODO виводити кількфсть не з пропущеним строком і скільки осталось до дедлайна часу
         int countTime = 0;
         System.out.println(ANSI_RED + "\nНе виконанні завдання" + ANSI_RESET);
         readFromFileToList();
@@ -244,6 +244,8 @@ public class User {
         } else {
             System.out.println(ANSI_RED + countTime + " - З пропущеним строком виконання" + ANSI_RESET);
         }
+        countTime = (int) temporaryListToReadFromFile.stream().filter(s -> !s.contains("DONE")).count() - countTime;
+        System.out.println(ANSI_GREEN + countTime + " - З актуальним строком виконання" + ANSI_RESET);
         temporaryListToReadFromFile.clear();
     }
 
@@ -255,7 +257,7 @@ public class User {
         while (true) {
             System.out.println(ANSI_YELLOW + "Поточні таски---------------------------------------------------------------------------------------------------------------" + ANSI_RESET);
             temporaryListToReadFromFile.forEach(System.out::println);
-            System.out.print(ANSI_YELLOW + "Введіть номер таску якій хочете видалити, якщо хочете видалити все введіть all, для закінчення введіть stop: " + ANSI_RESET);
+            System.out.print(ANSI_YELLOW + "Введіть номер таску якій хочете видалити\nДля видалення всіх таксів - all\nДля видалення зроблених - DONE\nДля закінчення - stop\nПоле для вводу:" + ANSI_RESET);
             temp = scan.next();
             if (temp.equalsIgnoreCase("stop")) {
                 break;
@@ -268,24 +270,26 @@ public class User {
                 }
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                     writer.write("");
-                    return;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 System.out.println(ANSI_GREEN + "Всі таски видалено" + ANSI_RESET);
-            } else {
+                return;
+            }
+            if(temp.equalsIgnoreCase("DONE")){
+                //TODO
+            }
+            else {
                 try {
                     intTemp = Integer.parseInt(temp);
                 } catch (Exception e) {
                     break;
                 }
-            }
-            for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
-                if(temporaryListToReadFromFile.get(i).contains("Task " + intTemp + ":")){
-                    try {
+                for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
+                    if (temporaryListToReadFromFile.get(i).contains("Task " + intTemp + ":")) {
                         temporaryListToReadFromFile.remove(i);
-                    }catch(Exception e){}
-                    System.out.println(ANSI_GREEN + "Task " + intTemp + " видалено" + ANSI_RESET);
+                        System.out.println(ANSI_GREEN + "Task " + intTemp + " видалено" + ANSI_RESET);
+                    }
                 }
             }
         }
@@ -297,6 +301,7 @@ public class User {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        temporaryListToReadFromFile.clear();
     }
 
     private void readFromFileToList() {

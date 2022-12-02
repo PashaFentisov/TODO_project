@@ -10,7 +10,7 @@ public class Task{
     static private DateTimeFormatter formatForExpiryDate = DateTimeFormatter.ofPattern("d MMMM");
     private String text;
     private boolean isDone;
-    private LocalDate doBefore;
+    private LocalDate doBefore = LocalDate.now();
     private LocalDate doneDate;
     private boolean isOnTime;
     private int number;
