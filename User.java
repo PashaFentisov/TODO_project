@@ -245,7 +245,7 @@ public class User {
     }
 
     private static int intTemp;
-    public void deleteTasksFromFile() {  //TODO додати видалення зроблених
+    public void deleteTasksFromFile() {
         tasksList.clear();
         String temp;
         readFromFileToList();
@@ -272,7 +272,20 @@ public class User {
                 return;
             }
             if(temp.equalsIgnoreCase("DONE")){
-                //TODO
+                System.out.print(ANSI_RED + "Всі виконані таски будуть видалені з пам'яті, для підтвердження натисніть enter, для відміни введіть stop: " + ANSI_RESET);
+                scan.nextLine();
+                if(scan.nextLine().equalsIgnoreCase("stop")){
+                    continue;
+                }
+                for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
+                    if(temporaryListToReadFromFile.get(i).contains("DONE")){
+                        temporaryListToReadFromFile.remove(i);
+                        --i;
+                    }
+                }
+                System.out.println(ANSI_GREEN + "Всі виконані таски видалено" + ANSI_RESET);
+                break;
+
             }
             else {
                 try {
