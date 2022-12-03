@@ -30,7 +30,19 @@ public class User {
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
     private List<String> temporaryListToReadFromFile = new ArrayList<>();
-    Task task;
+    private Task task;
+    private static User user;
+
+    private User() {
+    }
+
+    public synchronized static User getInstatnce(){
+        if(user==null){
+            user = new User();
+        }
+        return user;
+    }
+
 
     public void fillList() {
         int day;
@@ -112,8 +124,6 @@ public class User {
             addTasksToFile();
         }
     }
-//TODO make this class as Singletone
-
 
     public void showListTasks() {
         System.out.println(ANSI_YELLOW + "Ваші таски: " + ANSI_RESET);
@@ -312,4 +322,4 @@ public class User {
         }
     }
 }
-//TODO в майбутньому зробити через json запис списку тасків а не тексту
+//TODO в майбутньому зробити через серіалізацію

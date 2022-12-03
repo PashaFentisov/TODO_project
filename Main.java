@@ -10,7 +10,7 @@ public class Main {
 //        for (int i = 0; i < 1; i++) {
 //            method();
 //        }
-        User user = new User();
+        User user = User.getInstatnce();
         user.fillList();
 //        user.makeTaskDone();
 //        user.showDoneTasks();
