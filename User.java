@@ -25,8 +25,7 @@ public class User {
     public static final String ANSI_YELLOW = "\u001B[33m";
     //TODO Pattern p = Pattern.compile("\\d{1,3}");
     //TODO Matcher m = null;
-    static String sep = File.separator;
-    static File file = new File("D:" + sep + "idea project" + sep + "SomeProjects" + sep + "src" + sep + "TODO" + sep + "tasks.txt"); //TODO розобраться з файлом
+    static File file = new File("D:\\idea project\\TODO_project1Version\\tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
     private List<String> temporaryListToReadFromFile = new ArrayList<>();
