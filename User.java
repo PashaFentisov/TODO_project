@@ -2,7 +2,6 @@ package TODO;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -26,10 +25,10 @@ public class User {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
 
-    static File file = new File("D:\\idea project\\TODO_project1Version\\tasks.txt"); //TODO розобраться з файлом
+    static File file = new File("tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
-    private List<String> temporaryListToReadFromFile = new ArrayList<>();
+    private List<String> temporaryListToReadFromFile = new LinkedList<>();
     private Task task;
     private static User user;
 
@@ -93,12 +92,11 @@ public class User {
     public void editList() {
         showListTasks();
         System.out.print(ANSI_YELLOW + "ви хочете додати(add) таск чи видалити(delete) таск: " + ANSI_RESET);
-        String s = scan.next();
-        if (s.equalsIgnoreCase("add")) {
+        String tempString = scan.next();
+        if (tempString.equalsIgnoreCase("add")) {
             scan.nextLine();
             fillList();
         } else {
-            String tempString;
             int i;
             while (true) {
                 showListTasks();
@@ -132,16 +130,10 @@ public class User {
 
     public void showTasksInFile() {
         System.out.println(ANSI_YELLOW + "Ваші таски в файлі: " + ANSI_RESET);
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            while (reader.ready()) {
-                temporaryListToReadFromFile.add(reader.readLine());
-            }
-            temporaryListToReadFromFile.forEach(System.out::println);
-            countAllTasks = temporaryListToReadFromFile.size();
-            countDoneTasks = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).count();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        readFromFileToList();
+        temporaryListToReadFromFile.forEach(System.out::println);
+        countAllTasks = temporaryListToReadFromFile.size();
+        countDoneTasks = (int) temporaryListToReadFromFile.stream().filter(s -> s.contains("DONE")).count();
         System.out.println(ANSI_YELLOW + "\nВсього тасків: " + countAllTasks);
         System.out.println("Виконаних тасків: " + countDoneTasks);
         System.out.println("Не виконаних тасків: " + (countAllTasks - countDoneTasks) + ANSI_RESET);
@@ -167,10 +159,8 @@ public class User {
         }
     }
 
-    //TODO зробити спільний файл який буде гітхабі і таски писатимуться туда шлях до нього буде універсальний
-
     public void makeTaskDone() {
-        Pattern p = Pattern.compile("\\d{1,3}");
+        Pattern p = Pattern.compile("\\d{1,4}");
         Matcher m;
         temporaryListToReadFromFile.clear();
         readFromFileToList();
@@ -224,7 +214,7 @@ public class User {
         temporaryListToReadFromFile.clear();
     }
 
-    public void showTasksInProgress() {   //TODO виводити кількфсть не з пропущеним строком і скільки осталось до дедлайна часу
+    public void showTasksInProgress() {   //TODO виводити скільки осталось часу до дедлайна
         int countTime = 0;
         System.out.println(ANSI_RED + "\nНе виконанні завдання" + ANSI_RESET);
         readFromFileToList();
@@ -322,4 +312,4 @@ public class User {
         }
     }
 }
-//TODO в майбутньому зробити через серіалізацію
+

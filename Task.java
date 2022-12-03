@@ -54,22 +54,6 @@ public class Task{
         this("null");
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        isDone = done;
-    }
-
     public LocalDate getDoBefore() {
         return doBefore;
     }
@@ -78,36 +62,12 @@ public class Task{
         this.doBefore = doBefore;
     }
 
-    public LocalDate getDoneDate() {
-        return doneDate;
-    }
-
-    public void setDoneDate(LocalDate doneDate) {
-        this.doneDate = doneDate;
-    }
-
-    public boolean isOnTime() {
-        return isOnTime;
-    }
-
-    public void setOnTime(boolean onTime) {
-        isOnTime = onTime;
-    }
-
     public int getNumber() {
         return number;
     }
 
     public void setNumber(int number) {
         this.number = number;
-    }
-
-    public static int getCountOfTasks() {
-        return countOfTasks;
-    }
-
-    public static void setCountOfTasks(int countOfTasks) {
-        Task.countOfTasks = countOfTasks;
     }
 
     @Override
