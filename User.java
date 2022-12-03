@@ -25,7 +25,7 @@ public class User {
 
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
-    
+
     static File file = new File("D:\\idea project\\TODO_project1Version\\tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
@@ -35,19 +35,21 @@ public class User {
     public void fillList() {
         int day;
         int month;
+        String tempString;
         while (true) {
             System.out.print(ANSI_YELLOW + "Введіть таск який хочете додати до файлу, або stop: " + ANSI_RESET);
-            task = new Task(scan.nextLine());
-            if (task.getText().equalsIgnoreCase("stop")) {
+            tempString = scan.nextLine();
+            if (tempString.equalsIgnoreCase("stop")) {
                 break;
             }
+            task = new Task(tempString);
             System.out.println(ANSI_YELLOW + "\nВведіть дату до якої треба виконати таск" + ANSI_RESET);
             System.out.print(ANSI_YELLOW + "Введіть день: " + ANSI_RESET);
             if (scan.hasNextInt()) {
                 day = scan.nextInt();
-                try{
+                try {
                     task.setDoBefore(task.getDoBefore().withDayOfMonth(day));
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("You entered wrong value, you have 1 day to do this task or edit it");
                     task.setDoBefore(task.getDoBefore().withDayOfMonth(LocalDate.now().getDayOfMonth()));
                 }
@@ -59,9 +61,9 @@ public class User {
             System.out.print(ANSI_YELLOW + "Введіть місяць: " + ANSI_RESET);
             if (scan.hasNextInt()) {
                 month = scan.nextInt();
-                try{
+                try {
                     task.setDoBefore(task.getDoBefore().withMonth(month));
-                }catch(Exception e){
+                } catch (Exception e) {
                     System.out.println("You entered wrong value, you have to finish this task this month");
                     task.setDoBefore(task.getDoBefore().withMonth(LocalDate.now().getMonthValue()));
                 }
@@ -76,44 +78,40 @@ public class User {
         addTasksToFile();
     }
 
-    //    /**
-//     * редагуєм список тасків перед записом їх у файл
-//     * в гілці if викликаєм метод для додавання тасків до списку
-//     * в гілці else видаляєм таски з списку перед подачею до файлу
-//     */
-//    public void editList() {
-//        showListTasks();
-//        System.out.print(ANSI_YELLOW + "ви хочете додати(add) таск чи видалити(delete)" + ANSI_RESET);
-//        System.out.println();
-//        String s = scan.next();
-//        if (s.equalsIgnoreCase("add")) {
-//            scan.nextLine();
-//            fillList();
-//            return;
-//        } else {
-//            int i;
-//            while (true) {
-//                showListTasks();
-//                System.out.print(ANSI_YELLOW + "Який таск за номером ви хочете видалити: " + ANSI_RESET);
-//                try {
-//                    i = scan.nextInt();
-//                    tasks.remove(i);
-//                    System.out.print(ANSI_YELLOW + "Таск було видалено якщо бажаєте закінчити редагування введіть stop" + ANSI_RESET);
-//                    System.out.println();
-//                    if (scan.next().equalsIgnoreCase("stop")) {
-//                        showListTasks();
-//                        break;
-//                    }
-//                } catch (Exception e) {
-//                        System.out.println(ANSI_YELLOW + "        !!!неправильне значення!!!" + ANSI_RESET);
-//                        System.out.println();
-//                    scan.nextLine();
-//                }
-//            }
-//            addTasksToFile();
-//        }
-//
-//    }
+    public void editList() {
+        showListTasks();
+        System.out.print(ANSI_YELLOW + "ви хочете додати(add) таск чи видалити(delete) таск: " + ANSI_RESET);
+        String s = scan.next();
+        if (s.equalsIgnoreCase("add")) {
+            scan.nextLine();
+            fillList();
+        } else {
+            String tempString;
+            int i;
+            while (true) {
+                showListTasks();
+                System.out.print(ANSI_YELLOW + "Який таск за номером ви хочете видалити: " + ANSI_RESET);
+                tempString = scan.next();
+                try {
+                    i = Integer.parseInt(tempString);
+                } catch (Exception e) {
+                    break;
+                }
+                for (int j = 0; j < tasksList.size(); j++) {
+                    if (tasksList.get(j).getNumber()==i) {
+                        tasksList.remove(j);
+                        System.out.println(ANSI_GREEN + "Task " + i + " видалено" + ANSI_RESET);
+                        for (int k = 0; k < tasksList.size(); k++) {
+                            if(tasksList.get(k).getNumber()>i){
+                                tasksList.get(k).setNumber(tasksList.get(k).getNumber()-1);
+                            }
+                        }
+                    }
+                }
+            }
+            addTasksToFile();
+        }
+    }
 //TODO make this class as Singletone
 
 
@@ -144,7 +142,7 @@ public class User {
         System.out.println(ANSI_YELLOW + "Ось таски які будуть додані в файл, якщо ви згодні введіть enter" + ANSI_RESET);
         showListTasks();
         if (!scan.next().equalsIgnoreCase("enter")) {
-            //TODO  editList();  and return back
+            editList();
         } else {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
                 for (int i = 0; i < tasksList.size(); i++) {
@@ -160,13 +158,6 @@ public class User {
     }
 
     //TODO зробити спільний файл який буде гітхабі і таски писатимуться туда шлях до нього буде універсальний
-    /**
-     * Помічаєм вибраний таск як зроблений (DONE) і помічаєм датою виконання
-     * Зчитуєм місткість файлу в список, вибираєм таск за номером, редагуєм і заносим назад в список
-     * Після завершення записуєм список в файл
-     *
-     * @see Main Main
-     */
 
     public void makeTaskDone() {
         Pattern p = Pattern.compile("\\d{1,3}");
@@ -182,7 +173,7 @@ public class User {
             if (m.matches()) {
                 j = Integer.parseInt(s);
                 try {
-                    if (LocalDate.now().isAfter(LocalDate.parse(temporaryListToReadFromFile.get(j-1).substring(temporaryListToReadFromFile.get(j-1).indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear(), Task.getFormatForDateOfMade()))) {
+                    if (LocalDate.now().isAfter(LocalDate.parse(temporaryListToReadFromFile.get(j - 1).substring(temporaryListToReadFromFile.get(j - 1).indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear(), Task.getFormatForDateOfMade()))) {
                         s = "З запізненням";
                     } else {
                         s = "Вчасно";
@@ -190,7 +181,7 @@ public class User {
                 } catch (Exception e) {
                     s = "";
                 }
-                temporaryListToReadFromFile.set(j-1, String.format("%-120s %-4s %s %s", temporaryListToReadFromFile.get(j-1), "DONE", LocalDate.now().format(Task.getFormatForDateOfMade()), s));
+                temporaryListToReadFromFile.set(j - 1, String.format("%-120s %-4s %s %s", temporaryListToReadFromFile.get(j - 1), "DONE", LocalDate.now().format(Task.getFormatForDateOfMade()), s));
             } else {
                 break;
             }
@@ -244,8 +235,8 @@ public class User {
         temporaryListToReadFromFile.clear();
     }
 
-    private static int intTemp;
     public void deleteTasksFromFile() {
+        int intTemp;
         tasksList.clear();
         String temp;
         readFromFileToList();
@@ -260,7 +251,7 @@ public class User {
             if (temp.equalsIgnoreCase("all")) {
                 System.out.print(ANSI_RED + "Всі таски будуть видалені з пам'яті, для підтвердження натисніть enter, для відміни введіть stop: " + ANSI_RESET);
                 scan.nextLine();
-                if(scan.nextLine().equalsIgnoreCase("stop")){
+                if (scan.nextLine().equalsIgnoreCase("stop")) {
                     continue;
                 }
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -271,14 +262,14 @@ public class User {
                 System.out.println(ANSI_GREEN + "Всі таски видалено" + ANSI_RESET);
                 return;
             }
-            if(temp.equalsIgnoreCase("DONE")){
+            if (temp.equalsIgnoreCase("DONE")) {
                 System.out.print(ANSI_RED + "Всі виконані таски будуть видалені з пам'яті, для підтвердження натисніть enter, для відміни введіть stop: " + ANSI_RESET);
                 scan.nextLine();
-                if(scan.nextLine().equalsIgnoreCase("stop")){
+                if (scan.nextLine().equalsIgnoreCase("stop")) {
                     continue;
                 }
                 for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
-                    if(temporaryListToReadFromFile.get(i).contains("DONE")){
+                    if (temporaryListToReadFromFile.get(i).contains("DONE")) {
                         temporaryListToReadFromFile.remove(i);
                         --i;
                     }
@@ -286,8 +277,7 @@ public class User {
                 System.out.println(ANSI_GREEN + "Всі виконані таски видалено" + ANSI_RESET);
                 break;
 
-            }
-            else {
+            } else {
                 try {
                     intTemp = Integer.parseInt(temp);
                 } catch (Exception e) {

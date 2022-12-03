@@ -11,10 +11,11 @@ public class Main {
 //            method();
 //        }
         User user = new User();
-        user.makeTaskDone();
-        user.showDoneTasks();
-        user.showTasksInProgress();
-        user.deleteTasksFromFile();
+        user.fillList();
+//        user.makeTaskDone();
+//        user.showDoneTasks();
+//        user.showTasksInProgress();
+//        user.deleteTasksFromFile();
 
 //    public static void method() {
 //        User me = new User();
