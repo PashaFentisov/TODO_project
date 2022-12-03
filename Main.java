@@ -11,7 +11,7 @@ public class Main {
 //            method();
 //        }
         User user = new User();
-        user.fillList();
+        user.makeTaskDone();
         user.showDoneTasks();
         user.showTasksInProgress();
         user.deleteTasksFromFile();

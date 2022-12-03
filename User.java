@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -23,8 +25,7 @@ public class User {
 
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
-    //TODO Pattern p = Pattern.compile("\\d{1,3}");
-    //TODO Matcher m = null;
+    
     static File file = new File("D:\\idea project\\TODO_project1Version\\tasks.txt"); //TODO розобраться з файлом
     transient Scanner scan = new Scanner(System.in);
     private LinkedList<Task> tasksList = new LinkedList<>();
@@ -159,61 +160,56 @@ public class User {
     }
 
     //TODO зробити спільний файл який буде гітхабі і таски писатимуться туда шлях до нього буде універсальний
-//
-//    /**
-//     * Помічаєм вибраний таск як зроблений (DONE) і помічаєм датою виконання
-//     * Зчитуєм місткість файлу в список, вибираєм таск за номером, редагуєм і заносим назад в список
-//     * Після завершення записуєм список в файл
-//     *
-//     * @see Main Main
-//     */
-//    public void makeTaskDone() {
-//        tasks.clear();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            while (reader.ready()) {
-//                tasks.add(reader.readLine());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        int j;
-//
-//        while (true) {
-//            String isBefore;
-//            showListTasks();
-//            System.out.print(ANSI_YELLOW + "Вкажіть номер таску який уже зробили, або будь який інший текст: " + ANSI_RESET);
-//            String s = scan.next();
-//            m = p.matcher(s);
-//            if (m.matches()) {
-//                dt = LocalDate.now();
-//                j = Integer.parseInt(s);
-//                try {
-//                    date = tasks.get(j).substring(tasks.get(j).indexOf("Виконати до")).replace("Виконати до ", "").trim() + " " + LocalDate.now().getYear();
-//                    ontime = LocalDate.parse(date, dtf);
-//                    if (dt.isAfter(ontime)) {
-//                        s = "З запізненням";
-//                    } else {
-//                        s = "Вчасно";
-//                    }
-//                } catch (Exception e) {
-//                    s = "";
-//                }
-//                tasks.set(j, String.format("%-120s %-4s %s %s", tasks.get(j), "DONE", dt.format(dtf), s));
-//            } else {
-//                break;
-//            }
-//        }
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-//            for (int i = 0; i < tasks.size(); i++) {
-//                writer.write(tasks.get(i));
-//                writer.newLine();
-//            }
-//            writer.flush();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
+    /**
+     * Помічаєм вибраний таск як зроблений (DONE) і помічаєм датою виконання
+     * Зчитуєм місткість файлу в список, вибираєм таск за номером, редагуєм і заносим назад в список
+     * Після завершення записуєм список в файл
+     *
+     * @see Main Main
+     */
+
+    public void makeTaskDone() {
+        Pattern p = Pattern.compile("\\d{1,3}");
+        Matcher m;
+        temporaryListToReadFromFile.clear();
+        readFromFileToList();
+        int j;
+        while (true) {
+            temporaryListToReadFromFile.forEach(System.out::println);
+            System.out.print(ANSI_YELLOW + "Вкажіть номер таску який уже зробили, або будь який інший текст: " + ANSI_RESET);
+            String s = scan.next();
+            m = p.matcher(s);
+            if (m.matches()) {
+                j = Integer.parseInt(s);
+                try {
+                    if (LocalDate.now().isAfter(LocalDate.parse(temporaryListToReadFromFile.get(j-1).substring(temporaryListToReadFromFile.get(j-1).indexOf("Виконати до:")).replace("Виконати до: ", "").trim() + " " + LocalDate.now().getYear(), Task.getFormatForDateOfMade()))) {
+                        s = "З запізненням";
+                    } else {
+                        s = "Вчасно";
+                    }
+                } catch (Exception e) {
+                    s = "";
+                }
+                temporaryListToReadFromFile.set(j-1, String.format("%-120s %-4s %s %s", temporaryListToReadFromFile.get(j-1), "DONE", LocalDate.now().format(Task.getFormatForDateOfMade()), s));
+            } else {
+                break;
+            }
+        }
+        writeTaskListToFile();
+        temporaryListToReadFromFile.clear();
+    }
+
+    private void writeTaskListToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < temporaryListToReadFromFile.size(); i++) {
+                writer.write(temporaryListToReadFromFile.get(i));
+                writer.newLine();
+            }
+            writer.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void showDoneTasks() {
         int countOnTime = 0;
